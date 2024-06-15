@@ -221,7 +221,8 @@ async function run() {
             const filter = { email: req.params.email }
             const updatedDoc = {
                 $set: {
-                    premiumExpireDate
+                    premiumExpireDate,
+                    isPremium: "yes"
                 }
             }
             const result = await userCollection.updateOne(filter, updatedDoc);
