@@ -137,14 +137,16 @@ async function run() {
                     $group: {
 
                         _id: "$publisher",
-                        articleCount: { $sum: 1 }
+                        articleCount: { $sum: 1 },
+                        totalViews: { $sum: "$view" }
                     }
                 },
                 {
                     $project: {
                         _id: 0,
                         publisherName: "$_id",
-                        articleCount: 1
+                        articleCount: 1,
+                        totalViews: 1
                     }
                 },
 
@@ -152,6 +154,8 @@ async function run() {
             const result = await articleCollection.aggregate(aggregatePipeline).toArray()
             res.send(result)
         })
+
+
         // add article to mongodb
         app.post('/add-article', async (req, res) => {
             const newArticle = req.body;
