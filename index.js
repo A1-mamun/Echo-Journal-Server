@@ -46,22 +46,35 @@ async function run() {
         })
 
         // middlewares
+
+        // verify token
         const verifyToken = (req, res, next) => {
             console.log(req.headers.authorization)
             if (!req.headers.authorization) {
-                return res.status(401).send({ message: 'forbidden access' })
+                return res.status(401).send({ message: 'unauthorized access' })
             }
             const token = req.headers.authorization.split(' ')[1]
             jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
                 if (err) {
-                    return res.status(401).send({ message: 'forbidden access' })
+                    return res.status(401).send({ message: 'unauthorized access' })
                 }
                 req.decoded = decoded
                 next()
             })
-
-
         }
+
+        // verify admin
+        const verifyAdmin = async (req, res, next) => {
+            const email = req.decoded.email
+            const query = { email: email };
+            const user = await userCollection.findOne(query)
+            const isAdmin = user?.role === 'admin'
+            if (!isAdmin) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            next()
+        }
+
         // all articles
         app.get('/articles', async (req, res) => {
             const result = await articleCollection.find().toArray();
@@ -118,7 +131,7 @@ async function run() {
         })
 
         // get all user
-        app.get('/users', verifyToken, async (req, res) => {
+        app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
             const result = await userCollection.find().toArray()
             res.send(result)
         })
