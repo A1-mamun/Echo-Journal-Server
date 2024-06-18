@@ -232,6 +232,19 @@ async function run() {
             const result = await userCollection.updateOne(filter, updatedDoc);
             res.send(result)
         })
+        // Premium user information update to user info
+
+        app.patch('/not-premium/:email', async (req, res) => {
+            const { premiumExpireDate } = req.body;
+            const filter = { email: req.params.email }
+            const updatedDoc = {
+                $set: {
+                    isPremium: "no"
+                }
+            }
+            const result = await userCollection.updateOne(filter, updatedDoc);
+            res.send(result)
+        })
 
         // make admin api
         app.patch('/users/:id', async (req, res) => {
