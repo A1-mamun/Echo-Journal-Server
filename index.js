@@ -199,7 +199,7 @@ async function run() {
 
 
         // add article to mongodb
-        app.post('/add-article', async (req, res) => {
+        app.post('/add-article', verifyToken, async (req, res) => {
             const newArticle = req.body;
             const result = await articleCollection.insertOne(newArticle);
             res.send(result)
