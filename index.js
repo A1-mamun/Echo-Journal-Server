@@ -86,6 +86,7 @@ async function run() {
             }
             next()
         }
+
         // all articles
         app.get('/articles', async (req, res) => {
             const result = await articleCollection.find().toArray();
@@ -134,7 +135,12 @@ async function run() {
         })
 
         // article base on email
-        app.get('/my-articles', async (req, res) => {
+        app.get('/my-articles', verifyToken, async (req, res) => {
+            const tokenEmail = req.decoded.email;
+            const userEmail = req.query?.email
+            if (tokenEmail !== userEmail) {
+                return res.status(403).send({ message: 'forbidden access' });
+            }
             let query = {}
             if (req.query?.email) { query = { author_email: req.query.email } }
             const result = await articleCollection.find(query).toArray();
@@ -238,7 +244,7 @@ async function run() {
         })
 
         // add publisher
-        app.post('/add-publisher', async (req, res) => {
+        app.post('/add-publisher', verifyToken, verifyAdmin, async (req, res) => {
             const user = req.body;
             const result = await publisherCollection.insertOne(user);
             res.send(result)
@@ -277,7 +283,6 @@ async function run() {
         // Premium user information update to user info
 
         app.patch('/not-premium/:email', async (req, res) => {
-            const { premiumExpireDate } = req.body;
             const filter = { email: req.params.email }
             const updatedDoc = {
                 $set: {
@@ -346,7 +351,7 @@ async function run() {
         })
 
         // update article
-        app.patch('/update-article/:id', async (req, res) => {
+        app.patch('/update-article/:id', verifyToken, async (req, res) => {
             const updatedArticle = req.body
             const filter = { _id: new ObjectId(req.params.id) }
             const updatedDoc = {
