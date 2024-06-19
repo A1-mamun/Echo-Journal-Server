@@ -75,6 +75,17 @@ async function run() {
             next()
         }
 
+        // verify premium
+        const verifyPremium = async (req, res, next) => {
+            const email = req.decoded.email
+            const query = { email: email };
+            const user = await userCollection.findOne(query)
+            const isPremium = user?.role === 'admin' || user?.isPremium === 'yes'
+            if (!isPremium) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            next()
+        }
         // all articles
         app.get('/articles', async (req, res) => {
             const result = await articleCollection.find().toArray();
