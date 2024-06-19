@@ -112,7 +112,7 @@ async function run() {
         })
 
         // premium articles
-        app.get('/premium-articles', async (req, res) => {
+        app.get('/premium-articles', verifyToken, verifyPremium, async (req, res) => {
             const query = {
                 access: "premium"
             }
