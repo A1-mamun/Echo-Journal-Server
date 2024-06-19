@@ -153,6 +153,11 @@ async function run() {
             res.send(result)
         })
 
+        // all articles for dashboard 
+        app.get('/all-articles', verifyToken, verifyAdmin, async (req, res) => {
+            const result = await articleCollection.find().toArray();
+            res.send(result)
+        })
         // get a user info based on email from db
         app.get('/user/:email', async (req, res) => {
             const query = { email: req.params.email }
@@ -294,7 +299,7 @@ async function run() {
         })
 
         // make admin api
-        app.patch('/users/:id', async (req, res) => {
+        app.patch('/users/:id', verifyToken, verifyAdmin, async (req, res) => {
             const filter = { _id: new ObjectId(req.params.id) }
             const updatedDoc = {
                 $set: {
@@ -306,7 +311,7 @@ async function run() {
         })
 
         // make premium api
-        app.patch('/make-premium/:id', async (req, res) => {
+        app.patch('/make-premium/:id', verifyToken, verifyAdmin, async (req, res) => {
             const filter = { _id: new ObjectId(req.params.id) }
             const updatedDoc = {
                 $set: {
@@ -318,7 +323,7 @@ async function run() {
         })
 
         // article approve api
-        app.patch('/approve/:id', async (req, res) => {
+        app.patch('/approve/:id', verifyToken, verifyAdmin, async (req, res) => {
             const filter = { _id: new ObjectId(req.params.id) }
             const updatedDoc = {
                 $set: {
@@ -330,14 +335,14 @@ async function run() {
         })
 
         // article delete api
-        app.patch('/delete/:id', async (req, res) => {
+        app.patch('/delete/:id', verifyToken, verifyAdmin, async (req, res) => {
             const query = { _id: new ObjectId(req.params.id) }
             const result = await articleCollection.deleteOne(query);
             res.send(result)
         })
 
         // article decline api
-        app.patch('/decline/:id', async (req, res) => {
+        app.patch('/decline/:id', verifyToken, verifyAdmin, async (req, res) => {
             const text = req.body.declined_text
             const filter = { _id: new ObjectId(req.params.id) }
             const updatedDoc = {
@@ -351,7 +356,7 @@ async function run() {
         })
 
         // update article
-        app.patch('/update-article/:id', verifyToken, async (req, res) => {
+        app.patch('/update-article/:id', async (req, res) => {
             const updatedArticle = req.body
             const filter = { _id: new ObjectId(req.params.id) }
             const updatedDoc = {
