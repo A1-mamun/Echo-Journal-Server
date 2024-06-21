@@ -158,6 +158,7 @@ async function run() {
             const result = await articleCollection.find().toArray();
             res.send(result)
         })
+
         // get a user info based on email from db
         app.get('/user/:email', async (req, res) => {
             const query = { email: req.params.email }
